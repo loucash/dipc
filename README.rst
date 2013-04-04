@@ -26,8 +26,28 @@ depending on if lock was granted or not.
     ... # critical section
     ... ml.release()
 
+
     >>> from dipc import MemcacheSemaphore
     ... ml = MemcacheSemaphore(["localhost:11211"], "semaphore", value=10, ttl=60)
     ... ml.acquire()
     ... # critical section
     ... ml.release()
+
+
+There are also decorators available: distributed_lock and distributed_semaphore
+First argument is a list of hosts, but it also can be a function that returns
+list of hosts (for those environments that have config file read in a lazy
+manner)
+
+    >>> from dipc.decorators import distributed_lock
+    ... 
+    ... @distributed_lock(["localhost:11211"], "lock", ttl=60)
+    ... def foo():
+    ...     # body
+
+
+    >>> from dipc.decorators import distributed_semaphore
+    ... 
+    ... @distributed_semaphore(["localhost:11211"], "semaphore", value=10, ttl=60)
+    ... def bar():
+    ...     # body
