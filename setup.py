@@ -12,7 +12,7 @@ except ImportError:
 
 setup(
     name='dipc',
-    version='0.3',
+    version='0.4',
     description='Distributed Inter-Process Communication Library implemented in Python and Memcache server',
     long_description='\n' + open('README.rst').read(),
     author='Lukasz Biedrycki',

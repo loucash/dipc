@@ -21,7 +21,8 @@ class MemcacheSemaphore(object):
         self.name = name
         self.value = value
         self.ttl = ttl
-        self.choosen_bucket = None
+        self.locked_bucket = None
+        self.lock_time = None
 
     def _sem_name(self, i):
         return "%s_%s" % (self.name, i)
@@ -31,7 +32,8 @@ class MemcacheSemaphore(object):
             for i in xrange(self.value):
                 result = self.client.add(self._sem_name(i), "1", time=self.ttl)
                 if result:
-                    self.choosen_bucket = i
+                    self.locked_bucket = i
+                    self.lock_time = time.time()
                     return True
             if not blocking:
                 break
@@ -41,7 +43,9 @@ class MemcacheSemaphore(object):
     __enter__ = acquire
 
     def release(self):
-        self.client.delete(self._sem_name(self.choosen_bucket))
+        if self.lock_time + self.ttl > time.time():
+            self.client.delete(
+                self._sem_name(self.locked_bucket))
 
     def invalidate_all(self):
         for i in xrange(self.value):
